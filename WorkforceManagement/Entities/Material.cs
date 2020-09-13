@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WorkforceManagement.Models
+namespace WorkforceManagement.Entities
 {
     public class Material
     {

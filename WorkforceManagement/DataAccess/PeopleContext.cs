@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using WorkforceManagement.Models;
+using WorkforceManagement.Entities;
 
 namespace WorkforceManagement.DataAccess
 {
@@ -35,7 +35,7 @@ namespace WorkforceManagement.DataAccess
                     DateOfBirth = new DateTimeOffset(),
                     Email = "asd@ad.com",
                     NIF = "adasd",
-                    Sex = "Male"
+                    Gender = "Male"
                 }
                 );
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace WorkforceManagement.Models
+namespace WorkforceManagement.Entities
 {
     public class Person
     {
@@ -33,11 +33,11 @@ namespace WorkforceManagement.Models
         public string Email { get; set; }
 
         [Required]
-        public string Sex { get; set; }
+        public string Gender { get; set; }
 
         //public Guid Material { get; set; }
 
-        //public List<Material> Materials { get; set; } = new List<Material>();
+        public List<Material> Materials { get; set; } = new List<Material>();
 
         public Person()
         {
