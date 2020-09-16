@@ -10,6 +10,7 @@ namespace WorkforceManagement.Entities
         public Guid Id { get; set; }
 
         [Required]
+        [MaxLength(100)]
         public string Reference { get; set; }
 
         [Required]

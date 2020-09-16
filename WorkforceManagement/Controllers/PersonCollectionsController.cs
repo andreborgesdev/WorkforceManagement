@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WorkforceManagement.Entities;
+using WorkforceManagement.Helpers;
 using WorkforceManagement.Models;
 using WorkforceManagement.Services;
 
@@ -27,10 +28,26 @@ namespace WorkforceManagement.Controllers
                 throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet("({ids})")]
-        public ActionResult<> GetPersonCollection([FromRoute] IEnumerable<Guid> ids)
+        [HttpGet("({ids})", Name = "GetPersonCollection")]
+        public IActionResult GetPersonCollection(
+            [FromRoute] 
+            [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
         {
+            if (ids == null)
+            {
+                return BadRequest();
+            }
 
+            var personEntities = _personRepository.GetPersons(ids);
+
+            if (ids.Count() != personEntities.Count())
+            {
+                return NotFound();
+            }
+
+            var personsToReturn = _mapper.Map<IEnumerable<PersonDto>>(personEntities);
+
+            return Ok(personsToReturn);
         }
 
         [HttpPost]
@@ -45,7 +62,12 @@ namespace WorkforceManagement.Controllers
 
             _personRepository.Save();
 
-            return Ok();
+            var personCollectionToReturn = _mapper.Map<IEnumerable<PersonDto>>(personEntities);
+            var idsAsString = string.Join(",", personCollectionToReturn.Select(a => a.Id));
+
+            return CreatedAtRoute("GetPersonCollection", 
+                new { ids = idsAsString },
+                personCollectionToReturn);
         }
     }
 }

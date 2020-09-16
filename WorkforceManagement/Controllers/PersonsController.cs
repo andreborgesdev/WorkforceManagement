@@ -88,5 +88,31 @@ namespace WorkforceManagement.Controllers
 
             return CreatedAtRoute("GetPerson", new { personId = personToReturn.Id }, personToReturn);
         }
+
+        [HttpOptions]
+        public IActionResult GetPersonOptions()
+        {
+            Response.Headers.Add("Allow", "GET,OPTIONS,POST,PUT,PATCH");
+            return Ok();
+        }
+
+        [HttpDelete("{personId}")]
+        public ActionResult DeletePerson(Guid personId)
+        {
+            // We don't use the PersonExists here because we need the entity
+            // to pass to the delete repo method anyway, so we can save one DB call
+            var personFromRepo = _personRepository.GetPerson(personId);
+
+            if (personFromRepo == null)
+            {
+                return NotFound();
+            }
+
+            _personRepository.DeletePerson(personFromRepo);
+
+            _personRepository.Save();
+
+            return NoContent();
+        }
     }
 }

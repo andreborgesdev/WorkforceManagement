@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WorkforceManagement.Models
 {
-    public class MaterialForCreationDto : MaterialForManipulationDto
+    public class MaterialForUpdateDto : MaterialForManipulationDto
     {
     }
 }

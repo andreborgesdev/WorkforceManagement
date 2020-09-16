@@ -14,6 +14,8 @@ namespace WorkforceManagement.Profiles
         {
             CreateMap<Material, MaterialDto>();
             CreateMap<MaterialForCreationDto, Material>();
+            CreateMap<MaterialForUpdateDto, Material>();
+            CreateMap<Material, MaterialForUpdateDto>();
         }
     }
 }
