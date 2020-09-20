@@ -32,7 +32,7 @@ namespace WorkforceManagement.Controllers
                 throw new ArgumentNullException(nameof(mapper));
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetMaterialsForPerson")]
         public ActionResult<IEnumerable<MaterialDto>> GetMaterialsForPerson(Guid personId)
         {
             if (!_materialRepository.PersonExists(personId))
@@ -63,7 +63,7 @@ namespace WorkforceManagement.Controllers
             return Ok(_mapper.Map<MaterialDto>(materialForPersonFromRepo));
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateMaterialForPerson")]
         public ActionResult<MaterialDto> CreateMaterialForPerson(Guid personId, MaterialForCreationDto material)
         {
             if (!_materialRepository.PersonExists(personId))

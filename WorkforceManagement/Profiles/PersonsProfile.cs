@@ -19,9 +19,13 @@ namespace WorkforceManagement.Profiles
                     opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"))
                 .ForMember(
                     dest => dest.Age,
-                    opt => opt.MapFrom(src => src.DateOfBirth.GetCurrentAge()));
+                    opt => opt.MapFrom(src => src.DateOfBirth.GetCurrentAge(src.DateOfDeath)));
 
             CreateMap<PersonForCreationDto, Person>();
+
+            CreateMap<PersonForCreationWithDateOfDeathDto, Person>();
+
+            CreateMap<Person, PersonFullDto>();
         }
     }
 }

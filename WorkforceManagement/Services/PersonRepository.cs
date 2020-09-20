@@ -3,17 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using WorkforceManagement.DataAccess;
 using WorkforceManagement.Entities;
+using WorkforceManagement.Helpers;
+using WorkforceManagement.Models;
 using WorkforceManagement.ResourceParameters;
+using WorkforceManagement.Services.Interfaces;
 
 namespace WorkforceManagement.Services
 {
     public class PersonRepository : IPersonRepository, IDisposable
     {
-        private readonly PeopleContext _context; 
+        private readonly PeopleContext _context;
+        private readonly IPropertyMappingService _propertyMappingService; 
 
-        public PersonRepository(PeopleContext context)
+        public PersonRepository(PeopleContext context,
+            IPropertyMappingService propertyMappingService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+
+            _propertyMappingService = propertyMappingService ?? 
+                throw new ArgumentNullException(nameof(propertyMappingService));
         }
 
         public void AddPerson(Person person)
@@ -82,17 +90,17 @@ namespace WorkforceManagement.Services
                 .ToList();
         }
 
-        public IEnumerable<Person> GetPersons(PersonsResourceParameters personsResourceParameters)
+        public PagedList<Person> GetPersons(PersonsResourceParameters personsResourceParameters)
         {
             if (personsResourceParameters == null)
             {
                 throw new ArgumentNullException(nameof(personsResourceParameters));
             }
 
-            if (string.IsNullOrWhiteSpace(personsResourceParameters.Gender) && string.IsNullOrWhiteSpace(personsResourceParameters.SearchQuery))
-            {
-                return GetPersons();
-            }
+            //if (string.IsNullOrWhiteSpace(personsResourceParameters.Gender) && string.IsNullOrWhiteSpace(personsResourceParameters.SearchQuery))
+            //{
+            //    return GetPersons();
+            //}
 
             var collection = _context.People as IQueryable<Person>;
 
@@ -112,7 +120,31 @@ namespace WorkforceManagement.Services
                 || a.Address.Contains(searchQuery));
             }
 
-            return collection.ToList();
+            if (!string.IsNullOrWhiteSpace(personsResourceParameters.OrderBy))
+            {
+                //collection = collection.OrderBy(a => a.FirstName).ThenBy(a => a.LastName);
+
+                // Get property mapping dictionary
+                var personPropertyMappingDictionary = _propertyMappingService.GetPropertyMapping<PersonDto, Person>();
+
+                collection = collection.ApplySort(personsResourceParameters.OrderBy, personPropertyMappingDictionary);
+            }
+
+            // It is important to add pagination last because we want to apply the pagination
+            // on the filtered and searched collection. And if we did it first we would be searching and
+            // filtering to only a small set of data, which would not return all the results, which is incorrect
+            // The -1 insures that if we want to get page 2, the amount of items on page 1 will be skipped
+
+            // Due to the Deferred Execution the query is only executed here because the IQueryably only
+            // stores the queries. Only when we do a for loop, ToList..., or singleton queries (average, first)
+            return PagedList<Person>.Create(collection,
+                personsResourceParameters.PageNumber,
+                personsResourceParameters.PageSize);
+
+            //collection
+            //.Skip(personsResourceParameters.PageSize * (personsResourceParameters.PageNumber - 1))
+            //.Take(personsResourceParameters.PageSize)
+            //.ToList();
         }
 
         public void UpdatePerson(Person person)

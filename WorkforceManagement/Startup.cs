@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
 using WorkforceManagement.DataAccess;
 using WorkforceManagement.Services;
+using WorkforceManagement.Services.Interfaces;
 
 namespace WorkforceManagement
 {
@@ -89,6 +90,25 @@ namespace WorkforceManagement
                     };
                 };
             });
+
+            // We had to configure that on the AddControllers, the problem is that AddNewtonsoftJson
+            // only comes after and at the time of the configuration it still doesn't exist
+            services.Configure<MvcOptions>(config =>
+            {
+                var newtonsoftJsonOutputFormatter = config.OutputFormatters
+                    .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+
+                if (newtonsoftJsonOutputFormatter != null)
+                {
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.hateoas+json");
+                }
+            });
+
+            // Register PropertyMappingService
+            services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+
+            // Register PropertyCheckerService
+            services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

@@ -20,6 +20,8 @@ namespace WorkforceManagement.Entities
         [Required]
         public DateTimeOffset DateOfBirth { get; set; }
 
+        public DateTimeOffset? DateOfDeath { get; set; }
+
         [Required]
         public string Address { get; set; }
 
