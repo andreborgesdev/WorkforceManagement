@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -17,6 +18,9 @@ namespace WorkforceManagement.Controllers
 {
     [ApiController]
     [Route("api/persons/{personId}/materials")]
+    [HttpCacheExpiration(CacheLocation = CacheLocation.Public)]
+    [HttpCacheValidation(MustRevalidate = true)]
+    //[ResponseCache(CacheProfileName = "240SecondsCacheProfile")]
     public class MaterialsController : ControllerBase
     {
         private readonly IMaterialRepository _materialRepository;
@@ -46,6 +50,9 @@ namespace WorkforceManagement.Controllers
         }
 
         [HttpGet("{materialId}", Name ="GetMaterialForPerson")]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 1000)]
+        [HttpCacheValidation(MustRevalidate = false)]
+        //[ResponseCache(Duration = 120)]
         public ActionResult<MaterialDto> GetMaterialForPerson(Guid personId, Guid materialId)
         {
             if (!_materialRepository.PersonExists(personId))
